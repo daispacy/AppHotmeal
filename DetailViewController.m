@@ -37,6 +37,7 @@
 @synthesize txtName;
 @synthesize productView;
 @synthesize productInCart;
+@synthesize totalCart;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -53,6 +54,7 @@
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     idEstore = [defaults objectForKey:@"idEstore"];
     self.productInCart=[[NSMutableArray alloc]init];
+    totalCart=0;
     _esManager=[[estoreDetailManager alloc]init];
     _esManager.esConnect=[[estoreDetailConnect alloc]init];
     _esManager.esConnect.delegate=_esManager;
@@ -73,11 +75,14 @@
     ShoppingCartViewController *svc = [self.tabBarController.viewControllers objectAtIndex:1];
     
     svc.delegate = self;
-  
+    sleep(3);
    }
 -(NSMutableArray*)getProduct:(ShoppingCartViewController *)controller{
     NSLog(@"delegate called");
     return self.productInCart;
+}
+-(NSInteger)getTotalCart:(ShoppingCartViewController *)controller{
+    return self.totalCart;
 }
 -(void)displayData{
      NSLog(@"chay vao method customize");
@@ -175,6 +180,7 @@
             NSInteger _price=[cr1.price doubleValue];
             NSInteger _total = _price*cr1.quantity;
             cr1.total=_total;
+            self.totalCart +=[object.price doubleValue];
             NSLog(@"%d",cr1.quantity);
             flag=false;
             [self addToCartTapped:ip];
@@ -190,6 +196,7 @@
                 [cr setPrice:object.price];
                 [cr setName:object.name];
                 [cr setTotal:[object.price doubleValue]];
+                self.totalCart +=[object.price doubleValue];
                 [cr setStore_id:object.store_id];
                 [self.productInCart addObject:cr];
                 [self addToCartTapped:ip];
@@ -205,6 +212,7 @@
     [cr setName:object.name];
     [cr setTotal:[object.price doubleValue]];
     [cr setStore_id:object.store_id];
+    self.totalCart=[object.price doubleValue];
     [self.productInCart addObject:cr];
     [self addToCartTapped:ip];
     [self reloadBadgeNumber];

@@ -17,6 +17,6 @@
 @property (retain, nonatomic) IBOutlet UILabel *txtDescription;
 @property(strong,nonatomic)NSString *idEstore;
 @property(strong,nonatomic)NSMutableArray *productInCart;
-
+@property(assign,nonatomic)NSInteger totalCart;
 
 @end

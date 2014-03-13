@@ -9,10 +9,4 @@
 #import "EstoreCell.h"
 @implementation EstoreCell
 
-- (void)dealloc {
-    [_status release];
-    [_min_delivery release];
-    [_like release];
-    [super dealloc];
-}
 @end

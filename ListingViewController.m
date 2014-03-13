@@ -46,7 +46,8 @@
 }
 
 -(void)getData:(NSArray*)data{
-    
+    NSSortDescriptor *sort=[NSSortDescriptor sortDescriptorWithKey:@"status" ascending:NO];
+    [data sortUsingDescriptors:[NSArray arrayWithObject:sort]];
     _estore=data;
     [self.tableView reloadData];
 }

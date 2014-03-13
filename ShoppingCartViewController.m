@@ -7,6 +7,7 @@
 //
 
 #import "ShoppingCartViewController.h"
+#import "loginViewController.h"
 #import "CartCell.h"
 #import "cart.h"
 @interface ShoppingCartViewController (){
@@ -20,7 +21,8 @@
 @synthesize cartView;
 @synthesize cartArray;
 @synthesize delegate;
-
+@synthesize totalCart;
+@synthesize txtTotalCart;
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -39,12 +41,20 @@
 	// Do any additional setup after loading the view.
 }
 -(void)viewDidAppear:(BOOL)animated{
+    self.totalCart=[self.delegate getTotalCart:self];
+    NSLog(@"%d",self.totalCart);
+    self.cartArray=[self.delegate getProduct:self];
+    NSNumber *someNumber = [NSNumber numberWithDouble:self.totalCart];
+    NSNumberFormatter *nf = [[NSNumberFormatter alloc] init];
+    [nf setNumberStyle:NSNumberFormatterDecimalStyle];
+    NSString *someString = [nf stringFromNumber:someNumber];
+    
+    [self.txtTotalCart setText:[NSString stringWithFormat:@"%@ VND",someString]];
     self.cartArray=[self.delegate getProduct:self];
     [self.cartView reloadData];
     
 }
 -(void)viewWillAppear:(BOOL)animated{
-    self.cartArray=[self.delegate getProduct:self];
     [self.cartView reloadData];
 }
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
@@ -54,8 +64,6 @@
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return [cartArray count];
 }
-
-
 -(void)viewDidLayoutSubviews
 {
     CGFloat height = MAX(self.view.bounds.size.height, self.cartView.contentSize.height);
@@ -64,7 +72,8 @@
 }
 -(UITableViewCell*)tableView:(UITableView*)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     CartCell *cell=[tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-    cart *object = [cartArray objectAtIndex:indexPath.row];
+    if(indexPath.row<self.cartArray.count){
+    cart *object = [self.cartArray objectAtIndex:indexPath.row];
     [cell.quantity addTarget:self action:@selector(checkPrice:) forControlEvents:UIControlEventEditingChanged];
     cell.nameProduct.text=object.name;
     NSNumber *someNumber = [NSNumber numberWithDouble:object.total];
@@ -77,9 +86,17 @@
 
     //cell.price.text=object.price;
     cell.quantity.text=[NSString stringWithFormat:@"%d",object.quantity];
+    }
     return cell;
 }
-
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    
+    if ([segue.identifier isEqualToString:@"processCart"]) {
+        loginViewController *processViewController= segue.destinationViewController;
+        processViewController.ProductCart = self.cartArray;
+        processViewController.total = self.totalCart;
+    }
+}
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -88,34 +105,10 @@
 
 - (void)dealloc {
     [_btnProcess release];
+    [txtTotalCart release];
     [super dealloc];
 }
 
 - (IBAction)Process:(id)sender {
-    UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Login"
-                                                      message:nil
-                                                     delegate:self
-                                            cancelButtonTitle:@"Register"
-                                            otherButtonTitles:@"Login", nil];
-    
-    [message setAlertViewStyle:UIAlertViewStyleLoginAndPasswordInput];
-    
-    [message show];
-}
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
-    
-    if([title isEqualToString:@"Login"])
-    {
-        UITextField *username = [alertView textFieldAtIndex:0];
-        UITextField *password = [alertView textFieldAtIndex:1];
-        
-        NSLog(@"Username: %@\nPassword: %@", username.text, password.text);
-    }else if([title isEqualToString:@"Register"]){
-        UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"Notice" message:@"Coming soon" delegate:self cancelButtonTitle:@"Thoat" otherButtonTitles:nil, nil];
-        [alert setAlertViewStyle:UIAlertViewStyleDefault];
-        [alert show];
-    }
 }
 @end
